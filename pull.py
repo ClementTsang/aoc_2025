@@ -20,7 +20,7 @@ with open(f"day_{day.zfill(2)}/input.txt", "a+") as i:
 
     headers = {"Cookie": f"session={session}"}
     response = requests.get(
-        f"https://adventofcode.com/2024/day/{day}/input", headers=headers
+        f"https://adventofcode.com/2025/day/{day}/input", headers=headers
     )
 
     input = response.text
