@@ -6,6 +6,12 @@ import sys
 import requests
 
 # Script to watch for and pull the input for a given day.
+# This script caches results and prevents further pulling if
+# the input was previously successfully pulled, and includes
+# some user agent stuff if contact is needed.
+#
+# If any issues arise, please let me know!
+# - Clement
 
 day = sys.argv[1]
 
@@ -18,7 +24,10 @@ with open(f"day_{day.zfill(2)}/input.txt", "a+") as i:
 
     session = os.environ["AOC_SESSION"]
 
-    headers = {"Cookie": f"session={session}"}
+    headers = {
+        "Cookie": f"session={session}",
+        "User-Agent": "github.com/ClementTsang/aoc_2025/blob/main/pull.py",
+    }
     response = requests.get(
         f"https://adventofcode.com/2025/day/{day}/input", headers=headers
     )
