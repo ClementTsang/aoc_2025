@@ -5,7 +5,8 @@ import sys
 
 import requests
 
-# Script to watch for and pull the input for a given day.
+# Script to pull the input for a given day. Run this with `./pull.py <DAY>`.
+#
 # This script caches results and prevents further pulling if
 # the input was previously successfully pulled, and includes
 # some user agent stuff if contact is needed.
@@ -13,13 +14,14 @@ import requests
 # If any issues arise, please let me know!
 # - Clement
 
-day = sys.argv[1]
+day = str(int(sys.argv[1]))
+print(f"Fetching input for day {day}...")
 
 with open(f"day_{day.zfill(2)}/input.txt", "a+") as i:
     i.seek(0)
     curr = i.read()
     if len(curr) > 0 and not curr.startswith("Please don't"):
-        print("Not writing as input file is populated. Stopping.")
+        print("Not pulling as input file is populated.")
         exit(0)
 
     session = os.environ["AOC_SESSION"]
