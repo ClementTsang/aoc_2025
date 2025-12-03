@@ -71,6 +71,7 @@ def read_lines_to_list() -> List[str]:
         for line in f:
             line = line.strip()
             # lines.append(list(line))
+            # lines.append([int(v) for v in list(line)])) # Change the signature to List[int]
             lines.append(line)
 
     return lines
