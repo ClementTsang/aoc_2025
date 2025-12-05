@@ -1,68 +1,10 @@
 #!/bin/python3
 
 import sys
-from collections import Counter, defaultdict
-from copy import deepcopy
-from heapq import heappop, heappush
-from typing import List, Set, Tuple
-
-import multiprocess as mp
-import numpy as np
+from typing import List
 
 sys.setrecursionlimit(100000)
 FILE = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
-
-
-def demo_z3_solver():
-    # Who needs to think when you can z3
-    import z3
-
-    lines = read_lines_to_list()
-    answer = 0
-
-    solver = z3.Solver()
-    x, y, z, vx, vy, vz = [
-        z3.BitVec(var, 64) for var in ["x", "y", "z", "vx", "vy", "vz"]
-    ]
-
-    # 4 unknowns, so we just need 4 equations... I think.
-    for itx in range(4):
-        (cpx, cpy, cpz), (cvx, cvy, cvz) = lines[itx]
-
-        t = z3.BitVec(f"t{itx}", 64)
-        solver.add(t >= 0)
-        solver.add(x + vx * t == cpx + cvx * t)
-        solver.add(y + vy * t == cpy + cvy * t)
-        solver.add(z + vz * t == cpz + cvz * t)
-
-    if solver.check() == z3.sat:
-        model = solver.model()
-        (x, y, z) = (model.eval(x), model.eval(y), model.eval(z))
-        answer = x.as_long() + y.as_long() + z.as_long()
-
-
-def demo_network():
-    from networkx import Graph, connected_components, minimum_edge_cut
-
-    lines = read_lines_to_list()
-    answer = 1
-
-    graph = Graph()
-
-    for node, connections in lines:
-        graph.add_node(node)
-        for connection in connections:
-            graph.add_node(connection)
-            graph.add_edge(
-                *((node, connection) if node > connection else (connection, node))
-            )
-
-    cut = minimum_edge_cut(graph)
-    graph.remove_edges_from(cut)
-
-    components = connected_components(graph)
-    for component in components:
-        answer *= len(component)
 
 
 def read_lines_to_list() -> List[str]:
@@ -70,8 +12,6 @@ def read_lines_to_list() -> List[str]:
     with open(FILE, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            # lines.append(list(line)) # Change the return to Line[Line[str]]
-            # lines.append([int(v) for v in list(line)])) # Change the signature to List[int]
             lines.append(line)
 
     return lines
@@ -81,12 +21,75 @@ def part_one():
     lines = read_lines_to_list()
     answer = 0
 
+    read_ids = False
+    ranges = []
+
+    for line in lines:
+        if line == "":
+            read_ids = True
+            continue
+
+        if not read_ids:
+            split = line.split("-")
+            start = int(split[0])
+            end = int(split[1])
+
+            ranges.append((start, end))
+        else:
+            id = int(line)
+            for r in ranges:
+                if id >= r[0] and id <= r[1]:
+                    answer += 1
+                    break
+
     print(f"Part 1: {answer}")
+
+
+def overlap(a, b) -> bool:
+    return max(a[0], b[0]) <= min(a[1], b[1])
 
 
 def part_two():
     lines = read_lines_to_list()
     answer = 0
+    ranges = []
+
+    for line in lines:
+        if line == "":
+            break
+
+        split = line.split("-")
+        start = int(split[0])
+        end = int(split[1])
+
+        ranges.append((start, end))
+
+    while True:
+        curr_len = len(ranges)
+        for i in range(len(ranges)):
+            should_exit = False
+
+            for j in range(len(ranges)):
+                if j == i:
+                    continue
+
+                r = ranges[i]
+                s = ranges[j]
+                if overlap(r, s):
+                    ranges[i] = (min(r[0], s[0]), max(r[1], s[1]))
+                    ranges.pop(j)
+
+                    should_exit = True
+                    break
+
+            if should_exit:
+                break
+
+        if curr_len == len(ranges):
+            break
+
+    for r in ranges:
+        answer += r[1] - r[0] + 1
 
     print(f"Part 2: {answer}")
 
