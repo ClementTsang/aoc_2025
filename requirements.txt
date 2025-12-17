@@ -1,6 +1,7 @@
-z3-solver==4.13.3.0
+z3-solver==4.15.4.0
 numpy==2.3.5
 networkx==3.4.2
 requests==2.32.4
 multiprocess==0.70.17
 graphviz==0.20.3
+shapely==2.1.2
